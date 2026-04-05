@@ -1,36 +1,33 @@
+# 322587064 Elad Katz
+
 .section .data
+
 
 .section .text
 .globl strlen_sse42
 .type strlen_sse42, @function
 
 strlen_sse42:
-    # Initialize length counter (%rax) to 0
-    xorq %rax, %rax             
+    pushq %rcx # Save rcx on stack
+    xorq %rax, %rax # Zero counter (faster than ‘xorq %rcx, %rcx‘)
+    # %rax is the counter for the lenght of the string because in x86-64 functions always return their final answer in %rax saving us a step
     
-    # Fill %xmm0 with 0s to act as our null terminator reference
-    pxor %xmm0, %xmm0           
+    pxor %xmm0, %xmm0 # Fill %xmm0 with 0s to act as our null terminator
 
-.Lloop:
-    # Load 16 bytes of the string into %xmm1 
-    movdqu (%rdi, %rax), %xmm1  
-    
-    # FIXED: %xmm1 (the string) is now the source operand.
-    # The CPU will now correctly set the Zero Flag ONLY when 
-    # it finds a null byte in %xmm1.
-    pcmpistri $0x08, %xmm1, %xmm0
-    
-    # If a null byte is found, the Zero Flag (ZF) is set. Jump to finish.
-    jz .Lfound                  
-    
-    # If no null byte was found, add 16 to our length counter and loop
-    addq $16, %rax              
-    jmp .Lloop                  
+_strlen_next: # Label for start of the loop
+    # Load 16 bytes of the string into xmm1
+    movdqu (%rdi, %rax), %xmm1  # %rdi holds starting add of string and %rax holds current offset counter
 
-.Lfound:
-    # pcmpistri stored the exact index (0-15) of the null byte in %rcx.
-    # Add that index to our total length counter.
-    addq %rcx, %rax             
-    
-    # Return the final length
-    ret
+    # Checks if we hit the null terminator
+    pcmpistri $0x08, %xmm1, %xmm0 # If it finds a match flips the ZF and puts the index of the null terminator into %rcx
+
+    jz _strlen_done # If zero, exit loop
+
+    addq $16, %rax # Move offset conuter by another 16 Bytes
+    jmp _strlen_next # # Repeat
+
+_strlen_done:
+    addq %rcx, %rax # Save the index of the null terminator
+
+    ret 
+
