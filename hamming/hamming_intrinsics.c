@@ -1,3 +1,5 @@
+/* 322587064 Elad Katz */
+
 #include <emmintrin.h>   // SSE2
 #include <smmintrin.h>   // SSE4.1
 #include <string.h>

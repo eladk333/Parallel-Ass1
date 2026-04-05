@@ -1,4 +1,4 @@
-# 322587064 Elad Katz
+/* 322587064 Elad Katz */
 
 .section .data
 
