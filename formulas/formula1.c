@@ -30,10 +30,12 @@ float formula1(float *x, unsigned int length) {
         v_prod = _mm_mul_ps(v_prod, v_sq_plus_1); // multiply with what we had so far
     }
 
+    // Extracting the partial sums
     v_sum = _mm_hadd_ps(v_sum, v_sum);
     v_sum = _mm_hadd_ps(v_sum, v_sum);
-    float total_sum = _mm_cvtss_f32(v_sum);
-
+    float total_sum;
+    _mm_store_ss(&total_sum, v_sum);
+    
     __m128 v_temp = _mm_movehl_ps(v_prod, v_prod);
     v_prod = _mm_mul_ps(v_prod, v_temp);
     v_temp = _mm_shuffle_ps(v_prod, v_prod, _MM_SHUFFLE(1, 1, 1, 1));
