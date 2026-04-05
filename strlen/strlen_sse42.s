@@ -28,6 +28,6 @@ _strlen_next: # Label for start of the loop
 
 _strlen_done:
     addq %rcx, %rax # Save the index of the null terminator
-
+    popq %rcx # Restore rcx
     ret 
 
