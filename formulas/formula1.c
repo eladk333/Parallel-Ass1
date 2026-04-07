@@ -36,12 +36,13 @@ float formula1(float *x, unsigned int length) {
     float total_sum;
     _mm_store_ss(&total_sum, v_sum);
     
-    __m128 v_temp = _mm_movehl_ps(v_prod, v_prod);
+    __m128 v_temp = _mm_movehl_ps(v_prod, v_prod); // Takes the higher half of the vec and moves it into the lower part
     v_prod = _mm_mul_ps(v_prod, v_temp);
     v_temp = _mm_shuffle_ps(v_prod, v_prod, _MM_SHUFFLE(1, 1, 1, 1));
-    v_prod = _mm_mul_ps(v_prod, v_temp);
-    float total_prod = _mm_cvtss_f32(v_prod);
+    v_prod = _mm_mul_ps(v_prod, v_temp); // Second multiply 
+    float total_prod = _mm_cvtss_f32(v_prod); // Saving it
 
+    // For the trail elements
     for (; i < length; ++i) {
         total_sum += sqrtf(x[i]);
         total_prod *= (x[i] * x[i] + 1.0f);
